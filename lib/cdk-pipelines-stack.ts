@@ -12,26 +12,25 @@ export class CdkPipelinesStack extends Stack {
     const cloudAssemblyArtifact = new codepipeline.Artifact();
 
     const pipeline = new CdkPipeline(this, 'Pipeline', {
-      pipelineName: 'MyAppPipeline',
+      pipelineName: 'CDKPipeline',
       cloudAssemblyArtifact,
 
       sourceAction: new codepipeline_actions.GitHubSourceAction({
         actionName: 'GitHub',
         output: sourceArtifact,
-        oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_NAME'),
+        oauthToken: process.env['GITHUB_TOKEN_NAME'], // using environment variable instead of ssm
         trigger: codepipeline_actions.GitHubTrigger.POLL,
         // Replace these with your actual GitHub project info
-        owner: 'GITHUB-OWNER',
-        repo: 'GITHUB-REPO',
+        owner: 'steamhaus',
+        repo: 'kubeswitch',
       }),
 
-      synthAction: SimpleSynthAction.standardNpmSynth({
+      synthAction: SimpleSynthAction({
         sourceArtifact,
         cloudAssemblyArtifact,
-
-        // Use this if you need a build step (if you're not using ts-node
-        // or if you have TypeScript Lambdas that need to be compiled).
-        buildCommand: 'npm run build',
+        installCommand: 'npm install --save golang',
+        buildCommand: 'go build main.go',
+        synthCommand: 'cdk synth',
       }),
     });
   }
