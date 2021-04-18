@@ -18,14 +18,14 @@ export class CdkPipelinesStack extends Stack {
       sourceAction: new codepipeline_actions.GitHubSourceAction({
         actionName: 'GitHub',
         output: sourceArtifact,
-        oauthToken: process.env['GITHUB_TOKEN_NAME'], // using environment variable instead of ssm
+        oauthToken: SecretValue.secretsManager('GITHUB_TOKEN_NAME'),
         trigger: codepipeline_actions.GitHubTrigger.POLL,
         // Replace these with your actual GitHub project info
         owner: 'steamhaus',
         repo: 'kubeswitch',
       }),
 
-      synthAction: SimpleSynthAction({
+      synthAction: new SimpleSynthAction({
         sourceArtifact,
         cloudAssemblyArtifact,
         installCommand: 'npm install --save golang',
