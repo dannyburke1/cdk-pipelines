@@ -5,8 +5,6 @@ import { CdkPipeline, SimpleSynthAction } from '@aws-cdk/pipelines';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
 import { CdkPipelinesStack } from '../lib/cdk-pipelines-stack';
-import { App } from '@aws-cdk/core';
-
 
 class AppStage extends cdk.Stage {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -33,15 +31,15 @@ class PipelinesStack extends cdk.Stack {
           oauthToken: cdk.SecretValue.secretsManager('CODEPIPELINE_TOKEN'),
           trigger: codepipeline_actions.GitHubTrigger.POLL,
           owner: 'dannyburke1',
-          repo: 'go-cdk-pipeline-app',
+          repo: 'cdk-pipelines',
           branch: 'master'
         }),
         synthAction: new SimpleSynthAction({
             sourceArtifact,
             cloudAssemblyArtifact,
-            installCommand: 'npm install -g aws-cdk',
-            synthCommand: 'ls -l',
-            buildCommand: 'cdk synth'
+            installCommand: 'npm i -g npm && npm ci && npm i -g aws-cdk',
+            synthCommand: 'cdk synth',
+            buildCommand: 'cdk diff'
           }),
       });
 
